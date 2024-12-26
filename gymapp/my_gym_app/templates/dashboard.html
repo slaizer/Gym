@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }}</h1>
+    <p>User Type: {{ user.type }}</p>
+
+    <h2>Manage Users</h2>
+    {% if user.type == 'manager' or user.type == 'captin' %}
+        <h3>Add User</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <label>Username: <input type="text" name="username" required></label><br>
+            <label>Password: <input type="password" name="password" required></label><br>
+            <label>Type:
+                <select name="type" required>
+                    {% if user.type == 'manager' %}
+                        <option value="manager">Manager</option>
+                        <option value="captin">Captin</option>
+                    {% endif %}
+                    <option value="user">User</option>
+                </select>
+            </label><br>
+            <button type="submit">Add User</button>
+        </form>
+    {% endif %}
+
+    {% if user.type == 'manager' %}
+        <h3>Edit/Remove Users</h3>
+        <table border="1">
+            <tr>
+                <th>Username</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+            {% for u in users %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.type }}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="username" value="{{ u.username }}">
+                            <label>New Password: <input type="password" name="password"></label>
+                            <label>New Type:
+                                <select name="type">
+                                    <option value="manager" {% if u.type == 'manager' %}selected{% endif %}>Manager</option>
+                                    <option value="captin" {% if u.type == 'captin' %}selected{% endif %}>Captin</option>
+                                    <option value="user" {% if u.type == 'user' %}selected{% endif %}>User</option>
+                                </select>
+                            </label>
+                            <button type="submit">Edit</button>
+                        </form>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove">
+                            <input type="hidden" name="username" value="{{ u.username }}">
+                            <button type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <a href="/logout/">Logout</a>
+</body>
+</html>
