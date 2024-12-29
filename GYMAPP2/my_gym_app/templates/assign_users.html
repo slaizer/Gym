@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Users to Captains</title>
+</head>
+<body>
+    <h1>Assign Users to Captains</h1>
+    <p>Welcome, {{ user.username }} (Manager)</p>
+
+    <h2>Assign User</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Select User:</label>
+        <select name="username" id="username" required>
+            {% for u in users %}
+                <option value="{{ u.username }}">{{ u.username }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="captin">Assign to Captain:</label>
+        <select name="captin" id="captin" required>
+            {% for c in captins %}
+                <option value="{{ c.username }}">{{ c.username }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Assign</button>
+    </form>
+
+    <h2>Current Assignments</h2>
+    <table border="1">
+        <tr>
+            <th>User</th>
+            <th>Assigned Captain</th>
+        </tr>
+        {% for u in users %}
+            <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.assigned_to|default:"Not Assigned" }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <a href="/dashboard/">Back to Dashboard</a>
+</body>
+</html>

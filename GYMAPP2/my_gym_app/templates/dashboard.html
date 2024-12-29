@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }}</h1>
+    <p>User Type: {{ user.type }}</p>
+
+    <h2>Dashboard</h2>
+
+    <!-- Manager Section -->
+    {% if user.type == 'manager' %}
+        <h3>Manager Options</h3>
+        <ul>
+            <li><a href="/manage-users/">Manage Users</a></li>
+            <li><a href="/assign-users/">Assign Users to Captains</a></li>
+        </ul>
+    {% endif %}
+
+    <!-- Captain Section -->
+    {% if user.type == 'captin' %}
+        <h3>Managed Users</h3>
+        <ul>
+            {% for managed_user in managed_users %}
+                <li>
+                    {{ managed_user.username }}
+                    <a href="/manage-workouts/{{ managed_user.username }}/">Manage Workouts</a>
+                    <a href="/manage-food/{{ managed_user.username }}/">Manage Food & Supplements</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- User Section -->
+    {% if user.type == 'user' %}
+        <h3>Your Workouts</h3>
+        {% if courses %}
+            <ul>
+                {% for workout in courses %}
+                    <li>
+                        <strong>{{ workout.day }}</strong>
+                        <ul>
+                            {% for exercise in workout.exercises %}
+                                <li>
+                                    <strong>{{ exercise.name }}</strong><br>
+                                    Repeats: {{ exercise.repeats|join:", " }}<br>
+                                    Weights:
+                                    {% for weight in exercise.weights %}
+                                        <input type="text" name="weights" value="{{ weight }}" readonly style="width: 50px;">
+                                    {% endfor %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No workouts assigned yet.</p>
+        {% endif %}
+
+        <h3>Your Food and Supplements</h3>
+        {% if meals and meals|length > 0 %}
+            <ul>
+                {% for day in meals %}
+                    <li>
+                        <strong>{{ day.day }}</strong>
+                        <ul>
+                            {% for item in day.items %}
+                                <li>
+                                    <strong>{{ item.name }}</strong><br>
+                                    Calories: <input type="text" name="calories" value="{{ item.calories }}" readonly><br>
+                                    Priority: {{ item.priority }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No food and supplements assigned yet.</p>
+        {% endif %}
+    {% endif %}
+
+    <a href="/logout/">Logout</a>
+</body>
+</html>

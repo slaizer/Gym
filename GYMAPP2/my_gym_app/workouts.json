@@ -1,0 +1,67 @@
+[
+    {
+        "user": "x",
+        "workouts": [
+            {
+                "day": "Day1",
+                "exercises": [
+                    {
+                        "name": "a",
+                        "repeats": [],
+                        "weights": [],
+                        "priority": 1
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "user": "11",
+        "workouts": [
+            {
+                "day": "Day1",
+                "exercises": [
+                    {
+                        "name": "1",
+                        "repeats": [
+                            "1",
+                            "1",
+                            "1",
+                            "1",
+                            "1"
+                        ],
+                        "weights": [
+                            "1",
+                            "1",
+                            "1",
+                            "11"
+                        ],
+                        "priority": 1
+                    },
+                    {
+                        "name": "1",
+                        "repeats": [
+                            "2",
+                            "2",
+                            "2",
+                            "2",
+                            "2"
+                        ],
+                        "weights": [
+                            "2",
+                            "2",
+                            "2",
+                            "2",
+                            "2"
+                        ],
+                        "priority": 5
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "user": "111",
+        "workouts": []
+    }
+]
