@@ -1,0 +1,57 @@
+[
+    {
+        "username": "1",
+        "password": "1",
+        "type": "manager"
+    },
+    {
+        "username": "captin1",
+        "password": "captin123",
+        "type": "captin"
+    },
+    {
+        "username": "11",
+        "password": "user123",
+        "type": "user",
+        "assigned_to": "22"
+    },
+    {
+        "username": "taha",
+        "password": "taha",
+        "type": "manager"
+    },
+    {
+        "username": "a",
+        "password": "a",
+        "type": "captin"
+    },
+    {
+        "username": "x",
+        "password": "x",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "111",
+        "password": "111",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "22",
+        "password": "22",
+        "type": "captin"
+    },
+    {
+        "username": "55",
+        "password": "55",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "66",
+        "password": "66",
+        "type": "user",
+        "assigned_to": "22"
+    }
+]

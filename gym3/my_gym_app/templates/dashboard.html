@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dashboard-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .section-title {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .logout-btn {
+            margin-top: 20px;
+        }
+        .icon {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #4CAF50;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 50%;
+            display: inline-block;
+            text-align: center;
+            background-color: #e0f7fa;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .icon:hover {
+            color: #0284c7;
+            background-color: #b2ebf2;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mt-4">
+        <div class="dashboard-header">
+            <h1>Welcome, {{ user.username }}</h1>
+            <p>User Type: {{ user.type }}</p>
+        </div>
+
+        <h2 class="section-title">Dashboard</h2>
+
+        <!-- Manager Section -->
+        {% if user.type == 'manager' %}
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <span>Manager Options</span>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="/manage-users/" class="btn btn-sm btn-info">Manage Users</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="/assign-users/" class="btn btn-sm btn-info">Assign Users to Captains</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Captain Section -->
+        {% if user.type == 'captin' %}
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <span>Managed Users</span>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for managed_user in managed_users %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ managed_user.username }}</span>
+                        <div>
+                            <a href="/manage-workouts/{{ managed_user.username }}/" class="btn btn-sm btn-primary">Manage Workouts</a>
+                            <a href="/manage-food/{{ managed_user.username }}/" class="btn btn-sm btn-secondary">Manage Food & Supplements</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- User Section -->
+        {% if user.type == 'user' %}
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <span>Your Workouts</span>
+                <span class="icon" onclick="toggleSection('workouts')">&#128170;</span>
+            </div>
+            <div class="card-body hidden" id="workouts">
+                {% if courses %}
+                <ul class="list-group">
+                    {% for workout in courses %}
+                    <li class="list-group-item">
+                        <strong>{{ workout.day }}</strong>
+                        <ul class="mt-2">
+                            {% for exercise in workout.exercises %}
+                            <li>
+                                <strong>{{ exercise.name }}</strong><br>
+                                Repeats: {{ exercise.repeats|join:", " }}<br>
+                                Weights:
+                                {% for weight in exercise.weights %}
+                                <input type="text" class="form-control d-inline-block w-25" value="{{ weight }}" readonly>
+                                {% endfor %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No workouts assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-white">
+                <span>Your Food and Supplements</span>
+                <span class="icon" onclick="toggleSection('food')">&#127860;</span>
+            </div>
+            <div class="card-body hidden" id="food">
+                {% if meals and meals|length > 0 %}
+                <ul class="list-group">
+                    {% for day in meals %}
+                    <li class="list-group-item">
+                        <strong>{{ day.day }}</strong>
+                        <ul class="mt-2">
+                            {% for item in day.items %}
+                            <li>
+                                <strong>{{ item.name }}</strong><br>
+                                Calories: <input type="text" class="form-control d-inline-block w-25" value="{{ item.calories }}" readonly><br>
+                                Priority: {{ item.priority }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No food and supplements assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="text-center logout-btn">
+            <a href="/logout/" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSection(id) {
+            const section = document.getElementById(id);
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

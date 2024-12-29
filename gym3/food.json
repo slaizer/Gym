@@ -1,0 +1,55 @@
+[
+    {
+        "user": "x",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": [
+                    {
+                        "name": "egge",
+                        "calories": "200",
+                        "priority": 1
+                    },
+                    {
+                        "name": "checking",
+                        "calories": "200",
+                        "priority": 2
+                    },
+                    {
+                        "name": "WheyProteing",
+                        "calories": "200",
+                        "priority": 2
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "user": "111",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": []
+            },
+            {
+                "day": "Day2",
+                "items": []
+            }
+        ]
+    },
+    {
+        "user": "11",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": [
+                    {
+                        "name": "egge",
+                        "calories": "200",
+                        "priority": 1
+                    }
+                ]
+            }
+        ]
+    }
+]
