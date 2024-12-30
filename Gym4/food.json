@@ -1,0 +1,103 @@
+[
+    {
+        "user": "x",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": [
+                    {
+                        "name": "egge",
+                        "calories": "200",
+                        "priority": 1
+                    },
+                    {
+                        "name": "checking",
+                        "calories": "200",
+                        "priority": 2
+                    },
+                    {
+                        "name": "1",
+                        "calories": "200",
+                        "priority": 3
+                    }
+                ]
+            },
+            {
+                "day": "Day2",
+                "items": []
+            }
+        ]
+    },
+    {
+        "user": "111",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": []
+            },
+            {
+                "day": "Day2",
+                "items": []
+            }
+        ]
+    },
+    {
+        "user": "11",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": [
+                    {
+                        "name": "egge",
+                        "calories": "200",
+                        "priority": 1
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "user": "55",
+        "meals": []
+    },
+    {
+        "user": "555",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": []
+            },
+            {
+                "day": "Day2",
+                "items": []
+            }
+        ]
+    },
+    {
+        "user": "Ramiz",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": [
+                    {
+                        "name": "Chicken ",
+                        "calories": "300",
+                        "priority": 1
+                    }
+                ]
+            },
+            {
+                "day": "Day2",
+                "items": []
+            },
+            {
+                "day": "Day3",
+                "items": []
+            },
+            {
+                "day": "Day4",
+                "items": []
+            }
+        ]
+    }
+]
