@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Captain - Manage Users</title>
+  <!-- Include Bootstrap or Tailwind, etc. as you need -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 py-4">
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-4">Captain - Manage Users</h1>
+
+    <!-- Button to go back to the dashboard -->
+    <div class="mb-3">
+      <a href="/dashboard/" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- List of assigned users -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-success text-white">My Users</div>
+      <div class="card-body">
+        {% if my_users and my_users|length > 0 %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Password</th>
+                <th>User Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in my_users %}
+              <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.password }}</td>
+                <td>{{ u.type }}</td>
+                <td>
+                  <!-- Edit user form -->
+                  <form method="POST" style="display:inline-block;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit" />
+                    <input type="hidden" name="username" value="{{ u.username }}" />
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-warning"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editModal{{ u.username }}">
+                      Edit
+                    </button>
+                    <!-- Modal for editing user password -->
+                    <div
+                      class="modal fade"
+                      id="editModal{{ u.username }}"
+                      tabindex="-1"
+                      aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Edit User: {{ u.username }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                            <label>New Password:</label>
+                            <input
+                              type="text"
+                              name="password"
+                              class="form-control mb-2"
+                              placeholder="Enter new password" />
+                            <!-- You could hide a type field if you want to confirm user type is "user" -->
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              data-bs-dismiss="modal">
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              class="btn btn-success">
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+
+                  <!-- Remove user form -->
+                  <form
+                    method="POST"
+                    style="display:inline-block;"
+                    onsubmit="return confirm('Are you sure you want to remove this user?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove" />
+                    <input type="hidden" name="username" value="{{ u.username }}" />
+                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No users assigned yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Add new user form -->
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">Add New User</div>
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add" />
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="text" name="password" class="form-control" required />
+          </div>
+          <!-- This type field is optional. The server-side logic in the view
+               will force it to 'user' anyway if the user is a captain. -->
+          <div class="mb-3">
+            <label class="form-label">Type (Captain can only create 'user')</label>
+            <select name="type" class="form-select">
+              <option value="user" selected>User</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
