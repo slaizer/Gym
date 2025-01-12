@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gym</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(120deg, #1f2937, #4b5563);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            color: black;
+            transform: perspective(1000px) rotateY(2deg);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) perspective(1000px) rotateY(2deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) perspective(1000px) rotateY(2deg);
+            }
+        }
+        .login-header {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .btn-login {
+            background: #4CAF50;
+            color: white;
+            transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        .btn-login:hover {
+            background: #45A049;
+            transform: scale(1.02);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+        }
+        .form-control {
+            border: 1px solid #ccc;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .error-message {
+            background-color: rgba(255,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-align: center;
+            margin-top: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="login-header">Gym Login</h1>
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
+                <div class="invalid-feedback">Please enter your username.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                <div class="invalid-feedback">Please enter your password.</div>
+            </div>
+            <button type="submit" class="btn btn-login w-100">Login</button>
+        </form>
+        {% if error %}
+        <p class="error-message">{{ error }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Bootstrap form validation
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+</body>
+</html>
