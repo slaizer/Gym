@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Food and Supplements</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #1e293b, #64748b);
+      color: #f8fafc;
+    }
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      color: #38bdf8;
+      margin: 20px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    form {
+      margin: 20px auto;
+      text-align: center;
+    }
+    form button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      background: #38bdf8;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    form button:hover {
+      background: #0284c7;
+    }
+    .meal-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      color: #1e293b;
+      transition: opacity 0.3s ease;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .food-item {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 10px 0;
+      padding: 15px;
+      background: #f8fafc;
+    }
+    .food-item h3 {
+      font-size: 1.2rem;
+      color: #1e293b;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .food-details {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .detail-item {
+      flex: 1 1 calc(33% - 10px);
+      margin: 5px;
+      text-align: center;
+    }
+    .detail-item input {
+      width: 100%;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .add-item-form {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .add-item-form button {
+      margin-top: 10px;
+      background: #38bdf8;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .add-item-form button:hover {
+      background: #0284c7;
+    }
+    .back-dashboard {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #38bdf8;
+      color: white;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 1rem;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+    .back-dashboard:hover {
+      background: #0284c7;
+    }
+    /* Loading spinner styles */
+    #loading-indicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manage Food and Supplements</h1>
+  <a href="/dashboard" class="back-dashboard">Back to Dashboard</a>
+
+  <!-- Loading Indicator -->
+  <div id="loading-indicator">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Add Meal Day Form -->
+  <form method="POST" id="add-day-form" action="">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_day">
+    <button type="submit" class="btn btn-primary">Add Meal Day</button>
+  </form>
+
+  <!-- Meals Container -->
+  <div id="meals-container">
+    {% for day in meals %}
+    <div class="meal-container" data-day="{{ day.day }}">
+      <h2>{{ day.day }}</h2>
+      <!-- Remove Day Form -->
+      <form method="POST" class="remove-day-form" action="">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="remove_day">
+        <input type="hidden" name="day" value="{{ day.day }}">
+        <button type="submit" class="btn btn-danger">Remove Day</button>
+      </form>
+
+      {% for item in day.items %}
+      <div class="food-item">
+        <h3>{{ item.name }}</h3>
+        <div class="food-details">
+          <div class="detail-item">
+            <label>Calories</label>
+            <input type="text" value="{{ item.calories }}" readonly>
+          </div>
+          <div class="detail-item">
+            <label>Priority</label>
+            <input type="number" value="{{ item.priority }}" readonly>
+          </div>
+        </div>
+        <!-- Remove Item Form -->
+        <form method="POST" class="remove-item-form" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="remove_item">
+          <input type="hidden" name="day" value="{{ day.day }}">
+          <input type="hidden" name="item_name" value="{{ item.name }}">
+          <button type="submit" class="btn btn-warning mt-3">Remove</button>
+        </form>
+      </div>
+      {% endfor %}
+
+      <!-- Add Item Form -->
+      <form method="POST" class="add-item-form" action="">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_item">
+        <input type="hidden" name="day" value="{{ day.day }}">
+        <div class="mb-3">
+          <input type="text" name="item" placeholder="Food/Supplement Name" required class="form-control">
+        </div>
+        <div class="mb-3">
+          <input type="text" name="calories" placeholder="Calories (e.g., 150)" required class="form-control">
+        </div>
+        <div class="mb-3">
+          <input type="number" name="priority" placeholder="Priority (1-5)" required class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success">Add Item</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- JavaScript to handle AJAX form submissions -->
+  <script>
+    // Show the loading spinner.
+    function showLoading() {
+      document.getElementById('loading-indicator').style.display = 'block';
+    }
+
+    // Hide the loading spinner.
+    function hideLoading() {
+      document.getElementById('loading-indicator').style.display = 'none';
+    }
+
+    // Attach an event listener to handle a form submission via AJAX.
+    function ajaxifyForm(form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent the full page refresh.
+        showLoading(); // Display the spinner.
+
+        var formData = new FormData(form);
+        var actionUrl = form.getAttribute('action') || window.location.href;
+        var method = form.getAttribute('method') || 'POST';
+
+        fetch(actionUrl, {
+          method: method,
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text();
+        })
+        .then(function (html) {
+          // 1) Fade out the meals container
+          var container = document.getElementById('meals-container');
+          container.style.opacity = 0.5;
+
+          // 2) Parse the *entire* HTML we got back
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+
+          // 3) Find the updated #meals-container in the returned doc
+          var newContainer = doc.querySelector('#meals-container');
+          if (newContainer) {
+            // 4) Replace only the #meals-container portion
+            container.innerHTML = newContainer.innerHTML;
+          }
+
+          // 5) Restore opacity
+          container.style.opacity = 1;
+
+          // 6) Reattach AJAX handlers
+          attachAjaxHandlers();
+          hideLoading();
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+          hideLoading();
+        });
+      });
+    }
+
+    // Attach AJAX handlers to all forms on the page.
+    function attachAjaxHandlers() {
+      var forms = document.querySelectorAll('form');
+      forms.forEach(function (form) {
+        // Replace the form with a clone to remove any previous event listeners.
+        var newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        ajaxifyForm(newForm);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      attachAjaxHandlers();
+    });
+  </script>
+</body>
+</html>

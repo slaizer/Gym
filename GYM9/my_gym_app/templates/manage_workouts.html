@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Workouts</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Tailwind CSS (Optional) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #1e293b, #64748b);
+      color: #f8fafc;
+    }
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      color: #38bdf8;
+      margin: 20px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    form {
+      margin: 20px auto;
+      text-align: center;
+    }
+    form button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      background: #38bdf8;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    form button:hover {
+      background: #0284c7;
+    }
+    .back-dashboard {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #38bdf8;
+      color: white;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 1rem;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+    .back-dashboard:hover {
+      background: #0284c7;
+    }
+    /* Loading spinner styles */
+    #loading-indicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      display: none;
+    }
+    .workout-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      color: #1e293b;
+      transition: opacity 0.3s ease;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .exercise-row {
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 10px 0;
+      background: #f8fafc;
+    }
+    .exercise-row h3 {
+      font-size: 1.2rem;
+      color: #1e293b;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .exercise-details {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .detail-item {
+      flex: 1 1 calc(33% - 10px);
+      margin: 5px;
+      text-align: center;
+    }
+    .detail-item input {
+      width: 100%;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .add-exercise-form {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .add-exercise-form button {
+      margin-top: 10px;
+      background: #38bdf8;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .add-exercise-form button:hover {
+      background: #0284c7;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manage Workouts</h1>
+  <a href="/dashboard" class="back-dashboard">Back to Dashboard</a>
+
+  <!-- Loading Indicator -->
+  <div id="loading-indicator">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Add Day Form -->
+  <form method="POST" id="add-day-form" action="">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_day">
+    <button type="submit" class="btn btn-primary">Add Workout Day</button>
+  </form>
+
+  <!-- Workouts Container -->
+  <div id="workouts-container">
+    {% comment %}
+      The server is currently returning the full page on every request.
+      If “day” or “exercise” were added, these blocks will re‐render below.
+      The duplication issue arises if we blindly set container.innerHTML = entire HTML.
+      We'll fix it below in the <script> by parsing out only #workouts-container.
+    {% endcomment %}
+
+    {% for day in workouts %}
+    <div class="workout-container" data-day="{{ day.day }}">
+      <h2>{{ day.day }}</h2>
+      <!-- Remove Day Form -->
+      <form method="POST" class="remove-day-form" action="">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="remove_day">
+        <input type="hidden" name="day" value="{{ day.day }}">
+        <button type="submit" class="btn btn-danger">Remove Day</button>
+      </form>
+
+      {% for exercise in day.exercises %}
+      <div class="exercise-row">
+        <h3>{{ exercise.name }}</h3>
+        <div class="exercise-details">
+          <div class="detail-item">
+            <label>Repeats</label><br/>
+            {% for repeat in exercise.repeats %}
+              <input type="text" name="repeat_{{ forloop.counter }}" value="{{ repeat }}" readonly>
+            {% endfor %}
+          </div>
+          <div class="detail-item">
+            <label>Weights</label><br/>
+            {% for weight in exercise.weights %}
+              <input type="text" name="weight_{{ forloop.counter }}" value="{{ weight }}" readonly>
+            {% endfor %}
+          </div>
+          <div class="detail-item">
+            <label>Priority</label><br/>
+            <input type="number" value="{{ exercise.priority }}" readonly>
+          </div>
+        </div>
+        <!-- Remove Exercise Form -->
+        <form method="POST" class="remove-exercise-form" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="remove_exercise">
+          <input type="hidden" name="day" value="{{ day.day }}">
+          <input type="hidden" name="exercise_name" value="{{ exercise.name }}">
+          <button type="submit" class="btn btn-warning mt-3">Remove</button>
+        </form>
+      </div>
+      {% endfor %}
+
+      <!-- Add Exercise Form -->
+      <form method="POST" class="add-exercise-form" action="">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_exercise">
+        <input type="hidden" name="day" value="{{ day.day }}">
+        <div class="mb-3">
+          <input type="text" name="exercise" placeholder="Exercise Name" required class="form-control">
+        </div>
+        <div class="mb-3">
+          <input type="number" name="priority" placeholder="Priority" required class="form-control">
+        </div>
+        <div class="mb-3">
+          {% for i in range %}
+            <input type="text" name="repeats_new_{{ i }}" placeholder="Repeat {{ i }}" class="form-control mb-2">
+            <input type="text" name="weights_new_{{ i }}" placeholder="Weight {{ i }}" class="form-control mb-2">
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-success">Add Exercise</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- JavaScript to handle AJAX form submissions -->
+  <script>
+    // Show the loading spinner
+    function showLoading() {
+      document.getElementById('loading-indicator').style.display = 'block';
+    }
+
+    // Hide the loading spinner
+    function hideLoading() {
+      document.getElementById('loading-indicator').style.display = 'none';
+    }
+
+    // Attach an event listener to handle a form submission via AJAX
+    function ajaxifyForm(form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent the full page refresh
+        showLoading();      // Display the spinner
+
+        var formData = new FormData(form);
+        var actionUrl = form.getAttribute('action') || window.location.href;
+        var method = form.getAttribute('method') || 'POST';
+
+        fetch(actionUrl, {
+          method: method,
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text();
+        })
+        .then(function (html) {
+          // Smoothly fade out #workouts-container
+          var container = document.getElementById('workouts-container');
+          container.style.opacity = 0.5;
+
+          // 1) Parse the entire HTML text we got back
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+
+          // 2) Find the #workouts-container in the returned HTML
+          var newContainer = doc.querySelector('#workouts-container');
+
+          // 3) Replace just that portion
+          if (newContainer) {
+            container.innerHTML = newContainer.innerHTML;
+          }
+
+          // Restore full opacity
+          container.style.opacity = 1;
+
+          // Reattach AJAX handlers for new forms
+          attachAjaxHandlers();
+          hideLoading(); // Hide the spinner
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+          hideLoading();
+        });
+      });
+    }
+
+    // Reattach AJAX handlers to all forms
+    function attachAjaxHandlers() {
+      var forms = document.querySelectorAll('form');
+      forms.forEach(function (form) {
+        // Clone each form so we don't double‐bind events
+        var newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        ajaxifyForm(newForm);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      attachAjaxHandlers();
+    });
+  </script>
+ </body>
+</html>
