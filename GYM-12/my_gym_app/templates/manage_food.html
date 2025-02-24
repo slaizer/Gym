@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Food and Supplements</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Tailwind CSS (Optional) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #1e293b, #64748b);
+      color: #f8fafc;
+    }
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      color: #38bdf8;
+      margin: 20px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    form {
+      margin: 20px auto;
+      text-align: center;
+    }
+    form button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      background: #38bdf8;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    form button:hover {
+      background: #0284c7;
+    }
+    .back-dashboard {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #38bdf8;
+      color: white;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 1rem;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+    .back-dashboard:hover {
+      background: #0284c7;
+    }
+    /* Loading spinner styles */
+    #loading-indicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      display: none;
+    }
+    .meal-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      color: #1e293b;
+      transition: opacity 0.3s ease;
+    }
+    .day-header {
+      font-size: 1.5rem;
+      color: #1e293b;
+      margin-bottom: 10px;
+      text-align: center;
+      cursor: pointer; /* show it's clickable */
+    }
+    .day-details {
+      display: none; /* hidden by default; we expand on click */
+    }
+    .food-item {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 10px 0;
+      padding: 15px;
+      background: #f8fafc;
+    }
+    .food-details {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .detail-item {
+      flex: 1 1 calc(33% - 10px);
+      margin: 5px;
+      text-align: center;
+    }
+    .detail-item input {
+      width: 100%;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .add-item-form {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .add-item-form button {
+      margin-top: 10px;
+      background: #38bdf8;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .add-item-form button:hover {
+      background: #0284c7;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manage Food and Supplements</h1>
+  <a href="/dashboard" class="back-dashboard">Back to Dashboard</a>
+
+  <!-- Loading Indicator -->
+  <div id="loading-indicator">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Add Meal Day Form -->
+  <form method="POST" id="add-day-form" action="">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_day">
+    <button type="submit" class="btn btn-primary">Add Meal Day</button>
+  </form>
+
+  <!-- Meals Container -->
+  <div id="meals-container">
+    {% comment %}
+      The server will fill 'meals' in context, e.g.:
+      meals = [
+        { day: "Day 1", items: [...] },
+        { day: "Day 2", items: [...] },
+        ...
+      ]
+    {% endcomment %}
+    {% for day in meals %}
+    <div class="meal-container" data-day="{{ day.day }}">
+      <!-- Clickable heading to expand/collapse -->
+      <h2 class="day-header">{{ day.day }}</h2>
+
+      <!-- Hidden details that appear on click -->
+      <div class="day-details">
+        <!-- Remove Day Form -->
+        <form method="POST" class="remove-day-form" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="remove_day">
+          <input type="hidden" name="day" value="{{ day.day }}">
+          <button type="submit" class="btn btn-danger">Remove Day</button>
+        </form>
+
+        {% for item in day.items %}
+        <div class="food-item">
+          <h3>{{ item.name }}</h3>
+          <div class="food-details">
+            <div class="detail-item">
+              <label>Calories</label>
+              <input type="text" value="{{ item.calories }}" readonly>
+            </div>
+            <div class="detail-item">
+              <label>Priority</label>
+              <input type="number" value="{{ item.priority }}" readonly>
+            </div>
+          </div>
+          <!-- Remove Item Form -->
+          <form method="POST" class="remove-item-form" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="remove_item">
+            <input type="hidden" name="day" value="{{ day.day }}">
+            <input type="hidden" name="item_name" value="{{ item.name }}">
+            <button type="submit" class="btn btn-warning mt-3">Remove</button>
+          </form>
+        </div>
+        {% endfor %}
+
+        <!-- Add Item Form -->
+        <form method="POST" class="add-item-form" action="">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_item">
+          <input type="hidden" name="day" value="{{ day.day }}">
+          <div class="mb-3">
+            <input type="text" name="item" placeholder="Food/Supplement Name" required class="form-control">
+          </div>
+          <div class="mb-3">
+            <input type="text" name="calories" placeholder="Calories (e.g., 150)" required class="form-control">
+          </div>
+          <div class="mb-3">
+            <input type="number" name="priority" placeholder="Priority (1-5)" required class="form-control">
+          </div>
+          <button type="submit" class="btn btn-success">Add Item</button>
+        </form>
+      </div> <!-- /.day-details -->
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- JavaScript to handle toggling & AJAX form submissions -->
+  <script>
+    // Show the loading spinner
+    function showLoading() {
+      document.getElementById('loading-indicator').style.display = 'block';
+    }
+
+    // Hide the loading spinner
+    function hideLoading() {
+      document.getElementById('loading-indicator').style.display = 'none';
+    }
+
+    // Toggle display of .day-details on .day-header click
+    function attachDayToggle() {
+      const headers = document.querySelectorAll('.day-header');
+      headers.forEach(header => {
+        header.addEventListener('click', function() {
+          // The next sibling is .day-details
+          const details = header.nextElementSibling;
+          if (!details) return;
+          if (details.style.display === 'none' || !details.style.display) {
+            details.style.display = 'block';
+          } else {
+            details.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    // Return an array of day identifiers that are currently open
+    function getOpenDays() {
+      const open = [];
+      // For each .meal-container, check if .day-details is visible
+      document.querySelectorAll('.meal-container').forEach(container => {
+        const details = container.querySelector('.day-details');
+        if (details && details.style.display === 'block') {
+          open.push(container.dataset.day);
+        }
+      });
+      return open;
+    }
+
+    // Re-open the days that were open before the AJAX call
+    function restoreOpenDays(openDays) {
+      // After re-rendering, all .day-details are hidden by default
+      // We'll open them if they match one of the stored day identifiers
+      document.querySelectorAll('.meal-container').forEach(container => {
+        const dayId = container.dataset.day;
+        if (openDays.includes(dayId)) {
+          const details = container.querySelector('.day-details');
+          if (details) {
+            details.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Attach an event listener to handle a form submission via AJAX
+    function ajaxifyForm(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent full page refresh
+        showLoading();
+
+        // 1) Store which days are currently open
+        const openDays = getOpenDays();
+
+        const formData = new FormData(form);
+        const actionUrl = form.getAttribute('action') || window.location.href;
+        const method = form.getAttribute('method') || 'POST';
+
+        fetch(actionUrl, {
+          method: method,
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text();
+        })
+        .then(html => {
+          // 2) Parse the updated HTML to get the new #meals-container
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newContainer = doc.querySelector('#meals-container');
+
+          // 3) Replace existing #meals-container content
+          if (newContainer) {
+            const container = document.getElementById('meals-container');
+            container.style.opacity = 0.5;
+            container.innerHTML = newContainer.innerHTML;
+            container.style.opacity = 1;
+          }
+
+          // 4) Reattach day toggle logic and forms
+          attachDayToggle();
+          attachAjaxHandlers();
+
+          // 5) Restore whichever days were open
+          restoreOpenDays(openDays);
+
+          hideLoading();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          hideLoading();
+        });
+      });
+    }
+
+    // Reattach AJAX handlers to all forms on the page
+    function attachAjaxHandlers() {
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        // Clone to remove old event listeners
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        ajaxifyForm(newForm);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Attach toggles and AJAX to initial page
+      attachDayToggle();
+      attachAjaxHandlers();
+    });
+  </script>
+</body>
+</html>
