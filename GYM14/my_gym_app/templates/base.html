@@ -1,0 +1,22 @@
+{% load static %}
+<html>
+<head>
+  <title>My Gym App</title>
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="theme-color" content="#007BFF">
+</head>
+<body>
+  <!-- Content -->
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker
+          .register("{% static 'sw.js' %}")
+          .then(reg => console.log("ServiceWorker registered!", reg))
+          .catch(err => console.error("ServiceWorker registration failed:", err));
+      });
+    }
+  </script>
+</body>
+</html>
