@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Workouts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .workout-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin: 0 0 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Workouts</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_day">
+        <button type="submit">Add Workout Day</button>
+    </form>
+
+    {% for day in workouts %}
+    <div class="workout-container" data-day="{{ day.day }}">
+        <h2>{{ day.day }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="remove_day">
+            <input type="hidden" name="day" value="{{ day.day }}">
+            <button type="submit">Remove Day</button>
+        </form>
+
+        <ul>
+            {% for exercise in day.exercises %}
+            <li>
+                <span>{{ exercise.name }}</span> - <span>Repeats: {{ exercise.repeats|join:", " }}</span> - <span>Weights: {{ exercise.weights|join:", " }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</body>
+</html>

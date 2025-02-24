@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assign Users to Captains</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Excel-like styling for the Assignment Tree table */
+    .excel-table {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+    }
+    .excel-table th,
+    .excel-table td {
+      border: 1px solid #ccc;
+      padding: 0.75rem;
+    }
+    /* Indent for assigned users to visually represent the tree */
+    .child-user {
+      padding-left: 2rem; /* Adjust as needed */
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-gray-800 to-gray-600 min-h-screen flex items-center justify-center py-6">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Assign Users to Captains</h1>
+
+      <p class="text-center text-gray-600 mb-8">Welcome, {{ user.username }} (Manager)</p>
+
+      <!-- Assign User Form -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">Assign User</h2>
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+          <!-- Select User -->
+          <div>
+            <label for="username" class="block text-gray-700 font-medium mb-2">
+              Select User:
+            </label>
+            <select
+              name="username"
+              id="username"
+              class="form-select block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+              required
+            >
+              {% for u in users %}
+                <option value="{{ u.username }}">{{ u.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Assign to Captain -->
+          <div>
+            <label for="captin" class="block text-gray-700 font-medium mb-2">
+              Assign to Captain:
+            </label>
+            <select
+              name="captin"
+              id="captin"
+              class="form-select block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+              required
+            >
+              {% for c in captins %}
+                <option value="{{ c.username }}">{{ c.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-all"
+          >
+            Assign
+          </button>
+        </form>
+      </div>
+
+      <!-- Assignment Tree (Excel-like Table) -->
+      <div>
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">Assignment Tree</h2>
+        <div class="overflow-x-auto">
+          <table class="excel-table min-w-full text-left">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="text-gray-800">Captain / Assigned Users</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in captins %}
+                <!-- Captain Row -->
+                <tr class="bg-blue-50">
+                  <td class="font-bold text-blue-800">
+                    Captain: {{ c.username }}
+                  </td>
+                </tr>
+                <!-- Assigned Users for this Captain -->
+                {% for user in users %}
+                  {% if user.assigned_to == c.username %}
+                    <tr>
+                      <td class="child-user text-gray-700">
+                        └── {{ user.username }}
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="mt-6 text-center">
+        <a
+          href="/dashboard/"
+          class="text-indigo-600 hover:text-indigo-800 transition-all"
+        >
+          Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (Optional) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

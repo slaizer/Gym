@@ -1,0 +1,49 @@
+[
+    {
+        "user": "x",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": [
+                    {
+                        "name": "a",
+                        "quantity": "a",
+                        "priority": 1
+                    },
+                    {
+                        "name": "2",
+                        "quantity": "2",
+                        "priority": 2
+                    }
+                ]
+            },
+            {
+                "day": "Day2",
+                "items": []
+            },
+            {
+                "day": "Day3",
+                "items": [
+                    {
+                        "name": "1",
+                        "quantity": "1",
+                        "priority": 1
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "user": "111",
+        "meals": [
+            {
+                "day": "Day1",
+                "items": []
+            },
+            {
+                "day": "Day2",
+                "items": []
+            }
+        ]
+    }
+]
