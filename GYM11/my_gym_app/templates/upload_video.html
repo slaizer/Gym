@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upload Video Link</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* CSS3 transition for video thumbnails */
+    .video-thumbnail {
+      transition: transform 0.3s ease;
+    }
+    .video-thumbnail:hover {
+      transform: scale(1.05);
+    }
+    /* Custom modern header background */
+    header {
+      background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+    }
+    /* Override Bootstrap card header with Tailwind colors */
+    .card-header {
+      background-color: #1d4ed8;
+      color: #fff;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Header Section -->
+  <header class="py-3 mb-4 shadow-sm">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+      <a href="/dashboard/" class="text-white text-decoration-none">
+        <h1 class="h4 m-0">Your Gym App</h1>
+      </a>
+      <nav>
+        <ul class="nav">
+          <li class="nav-item"><a href="/dashboard/" class="nav-link text-white">Dashboard</a></li>
+          <li class="nav-item"><a href="/logout/" class="nav-link text-white">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container my-5">
+    <div class="row g-4">
+      <!-- Upload Form Column -->
+      <section class="col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Upload New Video</h2>
+          </div>
+          <div class="card-body">
+            {% if error %}
+              <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            {% if success %}
+              <div class="alert alert-success">{{ success }}</div>
+            {% endif %}
+            <form method="post" action="">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="video_type" class="form-label fw-bold">Video Type:</label>
+                <select name="video_type" id="video_type" class="form-select">
+                  <option value="workout">Workout Video</option>
+                  <option value="cooking">Cooking Video</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="youtube_url" class="form-label fw-bold">YouTube URL:</label>
+                <input type="url" name="youtube_url" id="youtube_url" required class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+              </div>
+              <div class="mb-3">
+                <label for="title" class="form-label fw-bold">Title:</label>
+                <input type="text" name="title" id="title" required class="form-control" placeholder="Video Title">
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label fw-bold">Description:</label>
+                <textarea name="description" id="description" rows="3" class="form-control" placeholder="Video Description"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="priority" class="form-label fw-bold">Priority:</label>
+                <input type="number" name="priority" id="priority" class="form-control" value="0" min="0">
+              </div>
+              <button type="submit" class="btn btn-primary">Upload Video</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Uploaded Videos Column -->
+      <section class="col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Your Uploaded Videos</h2>
+          </div>
+          <div class="card-body">
+            <!-- Workout Videos Section -->
+            <h3 class="h6 fw-bold">Workout Videos</h3>
+            {% if uploaded_workout_videos %}
+              <div class="list-group mb-4">
+                {% for video in uploaded_workout_videos %}
+                  {% with video.youtube_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+                  <div class="list-group-item d-flex align-items-center">
+                    <a href="{{ video.youtube_url }}" target="_blank">
+                      <img src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg" alt="{{ video.title }} Thumbnail" class="video-thumbnail rounded me-3" style="width: 120px;">
+                    </a>
+                    <div class="flex-grow-1">
+                      <a href="{{ video.youtube_url }}" target="_blank" class="fw-bold text-decoration-none">{{ video.title }}</a>
+                      <p class="mb-1">{{ video.description }}</p>
+                      <small class="text-muted">Priority: {{ video.priority }}</small>
+                    </div>
+                    <div>
+                      <a href="/remove-video/workout/{{ video.video_id }}/" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this video?');">Remove</a>
+                    </div>
+                  </div>
+                  {% endwith %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted">No workout videos uploaded yet.</p>
+            {% endif %}
+
+            <!-- Cooking Videos Section -->
+            <h3 class="h6 fw-bold">Cooking Videos</h3>
+            {% if uploaded_cooking_videos %}
+              <div class="list-group">
+                {% for video in uploaded_cooking_videos %}
+                  {% with video.youtube_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+                  <div class="list-group-item d-flex align-items-center">
+                    <a href="{{ video.youtube_url }}" target="_blank">
+                      <img src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg" alt="{{ video.title }} Thumbnail" class="video-thumbnail rounded me-3" style="width: 120px;">
+                    </a>
+                    <div class="flex-grow-1">
+                      <a href="{{ video.youtube_url }}" target="_blank" class="fw-bold text-decoration-none">{{ video.title }}</a>
+                      <p class="mb-1">{{ video.description }}</p>
+                      <small class="text-muted">Priority: {{ video.priority }}</small>
+                    </div>
+                    <div>
+                      <a href="/remove-video/cooking/{{ video.video_id }}/" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this video?');">Remove</a>
+                    </div>
+                  </div>
+                  {% endwith %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted">No cooking videos uploaded yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="py-3 mt-5" style="background: #1d4ed8;">
+    <div class="container text-center text-white">
+      <small>&copy; {{ now|date:"Y" }} Your Gym App</small>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
