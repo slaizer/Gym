@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+
+  <!-- Preconnect to the Tailwind CSS CDN -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+
+  <!-- Preload critical background images -->
+  <link rel="preload" as="image" href="https://images.everydayhealth.com/images/healthy-living/fitness/everything-you-need-know-about-fitness-1440x810.jpg?sfvrsn=2fee0a3b_5">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Utility class for hiding elements */
+    .hidden {
+      display: none;
+    }
+    /* Professional style for toggle icons */
+    .icon {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #c53030;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f7f7f7;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .icon:hover {
+      color: #a12d2d;
+      background-color: #e2e2e2;
+    }
+    /* Circular input styles with a refined look */
+    .circle-input {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      text-align: center;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 60px;
+      display: inline-block;
+      margin-right: 6px;
+      margin-top: 6px;
+      border: 2px solid;
+    }
+    .circle-input-repeats,
+    .circle-input-weights {
+      font-weight: bold;
+    }
+    .circle-input-repeats {
+      border-color: #c53030;
+      color: #c53030;
+      background-color: #fde8e8;
+    }
+    .circle-input-weights {
+      border-color: #2980b9;
+      color: #2980b9;
+      background-color: #eaf2f8;
+    }
+    .circle-input-calories {
+      border-color: #d35400;
+      color: #d35400;
+      background-color: #fef5e7;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-4" style="background: linear-gradient(120deg, #343a40, #23272b);">
+  <div class="container mx-auto px-4">
+    <!-- Dashboard Header -->
+    <header class="relative h-48 sm:h-64 md:h-80 rounded-md shadow-lg overflow-hidden mb-6">
+      <img src="https://i.imgur.com/1ZXohVn.jpeg" alt="Fitness" class="absolute inset-0 object-cover w-full h-full" loading="lazy">
+      <div class="absolute inset-0 bg-black opacity-60"></div>
+      <div class="relative z-10 text-center py-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-white">Welcome, {{ user.username }}</h1>
+        <p class="mt-2 text-white">User Type: {{ user.type }}</p>
+      </div>
+    </header>
+
+    <!-- Manager Section -->
+    {% if user.type == 'manager' %}
+    <section class="bg-white rounded-md shadow-sm mt-6 p-4 sm:p-6">
+      <h2 class="text-xl font-semibold mb-4 text-red-700">Manager Options</h2>
+      <ul class="divide-y divide-gray-200">
+        <li class="py-3 flex justify-between items-center">
+          <span>Manage system users</span>
+          <a href="/manage-users/" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md">Manage Users</a>
+        </li>
+        <li class="py-3 flex justify-between items-center">
+          <span>Assign users to captains</span>
+          <a href="/assign-users/" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md">Assign Users to Captains</a>
+        </li>
+      </ul>
+    </section>
+    {% endif %}
+
+    <!-- Captain Section -->
+    {% if user.type == 'captin' %}
+    <section class="relative rounded-md shadow-sm mt-6 overflow-hidden" style="background: url('https://i.imgur.com/tjHcru4.jpeg') center/cover;">
+      <div class="absolute inset-0 bg-black opacity-60"></div>
+      <div class="relative p-4 sm:p-6 font-bold text-white">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+          <h2 class="text-xl">Managed Users</h2>
+          <div class="flex space-x-2">
+            <a href="/captin-manage-users/" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md">Manage Users</a>
+            <a href="/upload-video/" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md">Upload Video Link</a>
+          </div>
+        </div>
+        {% if managed_users and managed_users|length > 0 %}
+        <ul class="divide-y divide-gray-300">
+          {% for managed_user in managed_users %}
+          <li class="py-3 flex flex-col sm:flex-row justify-between items-center">
+            <span>{{ managed_user.username }}</span>
+            <div class="space-x-0 sm:space-x-2 mt-2 sm:mt-0">
+              <a href="/manage-workouts/{{ managed_user.username }}/" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md mb-2 sm:mb-0 block sm:inline-block">
+                Manage Workouts
+              </a>
+              <a href="/manage-food/{{ managed_user.username }}/" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md block sm:inline-block">
+                Manage Food &amp; Supplements
+              </a>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p>No users assigned yet.</p>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- User Section -->
+    {% if user.type == 'user' %}
+    <!-- Workouts Card -->
+    <section class="bg-white rounded-md shadow-sm mt-6">
+      <header class="relative flex flex-col sm:flex-row justify-between items-center p-4 rounded-t-md overflow-hidden" style="background: url('https://i.imgur.com/iOFUoKX.jpeg') center/cover;">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <h2 class="text-xl font-bold text-white relative z-10">Your Workouts</h2>
+        <button class="icon relative z-10 mt-2 sm:mt-0" onclick="toggleSection('workouts')" title="Toggle Workouts">&#128170;</button>
+      </header>
+      <div id="workouts" class="relative hidden text-white font-bold" style="background: url('https://i.imgur.com/iOFUoKX.jpeg') center/cover;">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <div class="p-4 relative z-10">
+          {% if courses %}
+          <ul class="divide-y divide-gray-200">
+            {% for workout in courses %}
+            <li class="py-4">
+              <div class="cursor-pointer flex justify-between items-center"
+                   onclick="toggleSection('workout-{{ workout.day|slugify }}')">
+                <strong class="text-lg">{{ workout.day }}</strong>
+                <span class="icon">&#x25BC;</span>
+              </div>
+              <div id="workout-{{ workout.day|slugify }}" class="mt-2 hidden">
+                <ul class="space-y-2">
+                  {% for exercise in workout.exercises %}
+                  <li>
+                    <strong>{{ exercise.name }}</strong>
+                    <div class="mt-1">
+                      <span class="font-medium">Repeats:</span>
+                      {% for rep in exercise.repeats %}
+                      <input type="text" class="circle-input circle-input-repeats" value="{{ rep }}" readonly />
+                      {% endfor %}
+                    </div>
+                    <div class="mt-1">
+                      <span class="font-medium">Weights:</span>
+                      {% for weight in exercise.weights %}
+                      <!-- Add onClick to make the weight editable -->
+                      <input
+                        type="text"
+                        class="circle-input circle-input-weights"
+                        value="{{ weight }}"
+                        readonly
+                        onclick="editWeight(this, '{{ workout.day }}', '{{ exercise.name }}', '{{ forloop.parentloop.counter0 }}', '{{ forloop.counter0 }}')"
+                      />
+                      {% endfor %}
+                    </div>
+                  </li>
+                  {% if not forloop.last %}
+                  <hr class="my-2 border-gray-300">
+                  {% endif %}
+                  {% endfor %}
+                </ul>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-white">No workouts assigned yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Food and Supplements Card -->
+    <section class="bg-white rounded-md shadow-sm mt-6">
+      <header class="relative flex flex-col sm:flex-row justify-between items-center p-4 rounded-t-md overflow-hidden" style="background: url('https://i.imgur.com/PGbslf0.jpeg') center/cover;">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <h2 class="text-xl font-bold text-white relative z-10">Your Food and Supplements</h2>
+        <button class="icon relative z-10 mt-2 sm:mt-0" onclick="toggleSection('food')" title="Toggle Food">&#127860;</button>
+      </header>
+      <div id="food" class="relative hidden text-white font-bold" style="background: url('https://i.imgur.com/PGbslf0.jpeg') center/cover;">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <div class="p-4 relative z-10">
+          {% if meals and meals|length > 0 %}
+          <ul class="divide-y divide-gray-200">
+            {% for day in meals %}
+            <li class="py-4">
+              <div class="cursor-pointer flex justify-between items-center"
+                   onclick="toggleSection('food-day-{{ day.day|slugify }}')">
+                <strong class="text-lg">{{ day.day }}</strong>
+                <span class="icon">&#x25BC;</span>
+              </div>
+              <div id="food-day-{{ day.day|slugify }}" class="mt-2 hidden">
+                <ul class="mt-2">
+                  {% for item in day.items %}
+                  <li class="mb-2">
+                    <strong>{{ item.name }}</strong>
+                    <div class="mt-1">
+                      <span class="font-medium">Calories:</span>
+                      <input type="text" class="circle-input circle-input-calories" value="{{ item.calories }}" readonly />
+                    </div>
+                    <div class="mt-1">
+                      <span class="font-medium">Priority:</span> {{ item.priority }}
+                    </div>
+                  </li>
+                  {% if not forloop.last %}
+                  <hr class="my-2 border-gray-300">
+                  {% endif %}
+                  {% endfor %}
+                </ul>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-white">No food and supplements assigned yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Videos Card for Users -->
+    <section class="bg-white rounded-md shadow-sm mt-6">
+      <header class="relative flex flex-col sm:flex-row justify-between items-center p-4 rounded-t-md overflow-hidden"
+              style="background: url('https://i.imgur.com/x1rtw2c.jpeg') center/cover;">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <h2 class="text-xl font-bold text-white relative z-10">Your Video Links</h2>
+        <button class="icon relative z-10 mt-2 sm:mt-0" onclick="toggleSection('videos')" title="Toggle Videos">&#127909;</button>
+      </header>
+      <div id="videos" class="relative hidden text-white font-bold"
+           style="background: url('https://i.imgur.com/x1rtw2c.jpeg') center/cover;">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <div class="p-4 relative z-10">
+          {% if workout_videos or cooking_videos %}
+            {% if workout_videos %}
+            <h3 class="text-lg font-semibold mb-2">Workout Videos</h3>
+            <ul class="divide-y divide-gray-200 mb-4">
+              {% for video in workout_videos %}
+              <li class="py-3 flex items-center">
+                {% with video.youtube_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+                  <a href="{{ video.youtube_url }}" target="_blank">
+                    <img src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg" alt="{{ video.title }} Thumbnail" class="w-40 h-auto mr-4 rounded shadow-md">
+                  </a>
+                {% endwith %}
+                <div>
+                  <a href="{{ video.youtube_url }}" target="_blank" class="underline font-semibold">{{ video.title }}</a>
+                  <p>{{ video.description }}</p>
+                  <p class="text-sm">Priority: {{ video.priority }}</p>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if cooking_videos %}
+            <h3 class="text-lg font-semibold mb-2">Cooking Videos</h3>
+            <ul class="divide-y divide-gray-200">
+              {% for video in cooking_videos %}
+              <li class="py-3 flex items-center">
+                {% with video.youtube_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+                  <a href="{{ video.youtube_url }}" target="_blank">
+                    <img src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg" alt="{{ video.title }} Thumbnail" class="w-40 h-auto mr-4 rounded shadow-md">
+                  </a>
+                {% endwith %}
+                <div>
+                  <a href="{{ video.youtube_url }}" target="_blank" class="underline font-semibold">{{ video.title }}</a>
+                  <p>{{ video.description }}</p>
+                  <p class="text-sm">Priority: {{ video.priority }}</p>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          {% else %}
+            <p>No video links assigned yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Logout Button -->
+    <div class="text-center mt-8">
+      <a href="/logout/" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md">Logout</a>
+    </div>
+  </div>
+
+  <script>
+    // Toggle the visibility of an element by toggling the "hidden" class
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      if(section) {
+        section.classList.toggle('hidden');
+      } else {
+        console.warn('No element found with id:', id);
+      }
+    }
+
+    // Make the weight field editable when clicked
+    function editWeight(inputElem, day, exerciseName, exerciseIndex, weightIndex) {
+      // Remove readonly and focus the input
+      inputElem.removeAttribute('readonly');
+      inputElem.focus();
+
+      // When the user leaves the field, update the weight
+      inputElem.addEventListener('blur', function() {
+        updateWeight(inputElem.value, day, exerciseName, exerciseIndex, weightIndex, inputElem);
+      });
+
+      // Or when the Enter key is pressed
+      inputElem.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          updateWeight(inputElem.value, day, exerciseName, exerciseIndex, weightIndex, inputElem);
+        }
+      });
+    }
+
+    // Send the updated weight to the server
+    function updateWeight(newValue, day, exerciseName, exerciseIndex, weightIndex, inputElem) {
+      const data = {
+        day: day,
+        exercise_name: exerciseName,
+        exercise_index: exerciseIndex,
+        weight_index: weightIndex,
+        new_value: newValue
+      };
+
+      fetch('/update-weight/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          // Reset the field to read-only on success
+          inputElem.setAttribute('readonly', 'readonly');
+        } else {
+          alert('Error updating weight: ' + result.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+    // Helper to retrieve the CSRF token from cookies
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+[
+    {
+        "username": "1",
+        "password": "1",
+        "type": "manager"
+    },
+    {
+        "username": "captin1",
+        "password": "captin123",
+        "type": "captin"
+    },
+    {
+        "username": "11",
+        "password": "user123",
+        "type": "user",
+        "assigned_to": "captin1"
+    },
+    {
+        "username": "a",
+        "password": "a",
+        "type": "captin"
+    },
+    {
+        "username": "x",
+        "password": "x",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "111",
+        "password": "111",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "22",
+        "password": "22",
+        "type": "captin"
+    },
+    {
+        "username": "66",
+        "password": "66",
+        "type": "user",
+        "assigned_to": "22"
+    },
+    {
+        "username": "Ramiz",
+        "password": "123",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "444",
+        "password": "444",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "test",
+        "password": "test",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "test55",
+        "password": "test55",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "test33",
+        "password": "test33",
+        "type": "manager"
+    },
+    {
+        "username": "1111",
+        "password": "123",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "eess",
+        "password": "eess",
+        "type": "user",
+        "assigned_to": "captin1"
+    },
+    {
+        "username": "osama",
+        "password": "osama1",
+        "type": "captin"
+    },
+    {
+        "username": "osama1",
+        "password": "osama1",
+        "type": "user",
+        "assigned_to": "osama"
+    },
+    {
+        "username": "taha1",
+        "password": "taha",
+        "type": "captin"
+    },
+    {
+        "username": "taha",
+        "password": "taha",
+        "type": "user",
+        "assigned_to": "taha1"
+    },
+    {
+        "username": "00",
+        "password": "00",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "t",
+        "password": "t",
+        "type": "user",
+        "assigned_to": "a"
+    },
+    {
+        "username": "moh1",
+        "password": "moh",
+        "type": "captin"
+    }
+]
